@@ -1,0 +1,7 @@
+{
+	"name": "PL_10_Streaming_Ingestion",
+	"properties": {
+		"description": "Event Hubs/streaming architecture",
+		"annotations": []
+	}
+}
