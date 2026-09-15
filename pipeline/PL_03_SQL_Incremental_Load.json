@@ -144,6 +144,93 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Lookup_Max_Watermark",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "CP_SQL_Incremental_To_Bronze",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "@concat(\n'SELECT MAX(',\nitem().WatermarkColumn,\n') AS MaxWatermark\nFROM ',\nitem().SourceSchema,\n'.',\nitem().SourceTable,\n' WHERE ',\nitem().WatermarkColumn,\n' > ''',\nactivity('Lookup_Last_Watermark').output.firstRow.LastWatermarkValue,\n''''\n)",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "AzureSqlTable1",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "IF_New_Data_Available",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Lookup_Max_Watermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@not(empty(activity('Lookup_Max_Watermark').output.firstRow.MaxWatermark))",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "SP_Update_Watermark",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[usp_UpdateWatermark]",
+											"storedProcedureParameters": {
+												"@SourceTable": {
+													"value": "@item().SourceTable"
+												},
+												"@WatermarkColumn": {
+													"value": "@item().WatermarkColumn"
+												},
+												"@NewWatermark": {
+													"value": {
+														"value": "@activity('Lookup_Max_Watermark').output.firstRow.MaxWatermark",
+														"type": "Expression"
+													}
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "LS_AZSQL_ECOM_DEV",
+											"type": "LinkedServiceReference"
+										}
+									}
+								]
+							}
 						}
 					]
 				}
