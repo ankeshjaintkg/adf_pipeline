@@ -1,0 +1,7 @@
+{
+	"name": "PL_09_Master_Orchestration",
+	"properties": {
+		"description": "Dependency/parallel execution",
+		"annotations": []
+	}
+}
