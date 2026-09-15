@@ -78,7 +78,7 @@
 								"type": "Expression"
 							},
 							"p_directory": {
-								"value": "@pipeline().parameters.p_TargetFolder",
+								"value": "@concat(pipeline().parameters.p_TargetFolder,'/',pipeline().parameters.p_TargetSubFolder,'/ingestion_date=',formatDateTime(utcNow(),'dd-mm-yyyy'))",
 								"type": "Expression"
 							},
 							"p_file_name": {
@@ -110,6 +110,10 @@
 			"p_TargetFolder": {
 				"type": "string",
 				"defaultValue": "bronze"
+			},
+			"p_TargetSubFolder": {
+				"type": "string",
+				"defaultValue": "customers"
 			}
 		},
 		"annotations": []
