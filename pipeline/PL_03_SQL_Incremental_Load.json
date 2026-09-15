@@ -2,6 +2,159 @@
 	"name": "PL_03_SQL_Incremental_Load",
 	"properties": {
 		"description": "Watermark/incremental",
+		"activities": [
+			{
+				"name": "Lookup_Incremental_Metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT\n    SourceSchema,\n    SourceTable,\n    TargetContainer,\n    TargetFolder,\n    LoadType,\n    WatermarkColumn\nFROM dbo.ETL_Metadata\nWHERE SourceSystem = 'AzureSQL'\n  AND LoadType = 'Incremental'\n  AND IsActive = 1;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_Incremental_Tables",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_Incremental_Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_Incremental_Metadata').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Lookup_Last_Watermark",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat(\n'SELECT LastWatermarkValue\n FROM dbo.ETL_Watermark\n WHERE SourceTable = ''',\nitem().SourceTable,\n'''\n AND WatermarkColumn = ''',\nitem().WatermarkColumn,\n''''\n)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "AzureSqlTable1",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "CP_SQL_Incremental_To_Bronze",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Lookup_Last_Watermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": "@concat(\n'SELECT *\n FROM ',\nitem().SourceSchema,\n'.',\nitem().SourceTable,\n' WHERE ',\nitem().WatermarkColumn,\n' > ''',\nactivity('Lookup_Last_Watermark').output.firstRow.LastWatermarkValue,\n''''\n)",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SQL_SOURCE",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_SchemaName": {
+											"value": "@item().SourceSchema",
+											"type": "Expression"
+										},
+										"p_TableName": "@item().SourceTable"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_PARQUET_BRONZE",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_container": "@item().TargetContainer",
+										"p_directory": "@concat(     item().TargetFolder,     '/ingestion_date=',     formatDateTime(utcNow(),'yyyy-MM-dd') )",
+										"p_file_name": "@concat(     item().SourceTable,     '_incremental_',     formatDateTime(utcNow(),'yyyyMMddHHmmss'),     '.parquet' )"
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"p_TargetContainer": {
+				"type": "string",
+				"defaultValue": "bronze"
+			}
+		},
 		"annotations": []
 	}
 }
