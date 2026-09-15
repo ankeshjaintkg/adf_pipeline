@@ -1,0 +1,7 @@
+{
+	"name": "PL_03_SQL_Incremental_Load",
+	"properties": {
+		"description": "Watermark/incremental",
+		"annotations": []
+	}
+}
