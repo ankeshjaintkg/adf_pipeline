@@ -105,11 +105,11 @@
 			},
 			"p_TargetContainer": {
 				"type": "string",
-				"defaultValue": "bronze"
+				"defaultValue": "ecom-data"
 			},
 			"p_TargetFolder": {
 				"type": "string",
-				"defaultValue": "customers"
+				"defaultValue": "bronze"
 			}
 		},
 		"annotations": []
