@@ -2,6 +2,40 @@
 	"name": "PL_02_SQL_Full_Load",
 	"properties": {
 		"description": "SQL → ADLS Bronze",
+		"activities": [
+			{
+				"name": "Lookup_SQL_Metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT\n    SourceSchema,\n    SourceTable,\n    TargetContainer,\n    TargetFolder,\n    LoadType\nFROM dbo.ETL_Metadata\nWHERE SourceSystem = 'AzureSQL'\n  AND LoadType = 'Full'\n  AND IsActive = 1;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"parameters": {
+			"p_TargetContainer": {
+				"type": "string",
+				"defaultValue": "bronze"
+			}
+		},
 		"annotations": []
 	}
 }
