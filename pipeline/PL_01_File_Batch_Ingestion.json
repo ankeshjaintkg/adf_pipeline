@@ -6,6 +6,8 @@
 			{
 				"name": "CP_Source_To_Bronze",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -88,6 +90,47 @@
 						}
 					}
 				]
+			},
+			{
+				"name": "Lookup_File_Config",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "DS_File_Ingestion_Config",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_container": {
+								"value": "@pipeline().parameters.p_SourceContainer",
+								"type": "Expression"
+							},
+							"p_folder": {
+								"value": "@concat( pipeline().parameters.p_SourceDirectory,'/config')",
+								"type": "Expression"
+							},
+							"p_file": "file_ingestion_config.csv"
+						}
+					}
+				}
 			}
 		],
 		"parameters": {
