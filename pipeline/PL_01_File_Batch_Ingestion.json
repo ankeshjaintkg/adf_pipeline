@@ -2,6 +2,115 @@
 	"name": "PL_01_File_Batch_Ingestion",
 	"properties": {
 		"description": "CSV → ADLS Bronze",
+		"activities": [
+			{
+				"name": "CP_Source_To_Bronze",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_CSV_SOURCE",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_container": {
+								"value": "@pipeline().parameters.p_SourceContainer",
+								"type": "Expression"
+							},
+							"p_directory": {
+								"value": "@pipeline().parameters.p_SourceDirectory",
+								"type": "Expression"
+							},
+							"p_files": {
+								"value": "@pipeline().parameters.p_SourceFileName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_CSV_BRONZE",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_container": {
+								"value": "@pipeline().parameters.p_TargetContainer",
+								"type": "Expression"
+							},
+							"p_directory": {
+								"value": "@pipeline().parameters.p_TargetFolder",
+								"type": "Expression"
+							},
+							"p_file_name": {
+								"value": "@pipeline().parameters.p_SourceFileName",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"p_SourceContainer": {
+				"type": "string",
+				"defaultValue": "source"
+			},
+			"p_SourceDirectory": {
+				"type": "string"
+			},
+			"p_SourceFileName": {
+				"type": "string",
+				"defaultValue": "customers.csv"
+			},
+			"p_TargetContainer": {
+				"type": "string",
+				"defaultValue": "bronze"
+			},
+			"p_TargetFolder": {
+				"type": "string",
+				"defaultValue": "customers"
+			}
+		},
 		"annotations": []
 	}
 }
