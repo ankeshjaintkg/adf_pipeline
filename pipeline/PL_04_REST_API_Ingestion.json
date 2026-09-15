@@ -2,6 +2,88 @@
 	"name": "PL_04_REST_API_Ingestion",
 	"properties": {
 		"description": "REST API → Bronze",
+		"activities": [
+			{
+				"name": "CP_REST_To_Bronze",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_REST_SOURCE",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_relative_url": {
+								"value": "@pipeline().parameters.p_relative_url",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_JSON_BRONZE",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_container": {
+								"value": "@pipeline().parameters.p_target_container",
+								"type": "Expression"
+							},
+							"p_directory": {
+								"value": "@concat(pipeline().parameters.p_target_folder,'/ingestion_date=',formatDateTime(utcNow(),'yyyy-MM-dd'))",
+								"type": "Expression"
+							},
+							"p_file_name": {
+								"value": "@concat('users_',formatDateTime(utcNow(),'yyyyMMddHHmmss'),'.json')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"p_relative_url": {
+				"type": "string",
+				"defaultValue": "users"
+			},
+			"p_target_container": {
+				"type": "string",
+				"defaultValue": "bronze"
+			},
+			"p_target_folder": {
+				"type": "string",
+				"defaultValue": "api/users"
+			}
+		},
 		"annotations": []
 	}
 }
