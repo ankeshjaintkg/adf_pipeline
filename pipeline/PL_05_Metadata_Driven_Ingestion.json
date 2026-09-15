@@ -1,0 +1,7 @@
+{
+	"name": "PL_05_Metadata_Driven_Ingestion",
+	"properties": {
+		"description": "Dynamic/parameterized framework",
+		"annotations": []
+	}
+}
