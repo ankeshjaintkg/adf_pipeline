@@ -1,0 +1,7 @@
+{
+	"name": "PL_02_SQL_Full_Load",
+	"properties": {
+		"description": "SQL → ADLS Bronze",
+		"annotations": []
+	}
+}
