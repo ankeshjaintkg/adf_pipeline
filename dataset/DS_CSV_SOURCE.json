@@ -7,13 +7,15 @@
 		},
 		"parameters": {
 			"p_container": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "source"
 			},
 			"p_directory": {
 				"type": "string"
 			},
 			"p_files": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "customers.csv"
 			}
 		},
 		"annotations": [],
