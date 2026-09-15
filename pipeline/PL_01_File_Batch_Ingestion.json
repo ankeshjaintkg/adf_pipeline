@@ -50,7 +50,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup_File_Config",
+						"activity": "Filter_Active_Files",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -150,6 +150,29 @@
 							]
 						}
 					]
+				}
+			},
+			{
+				"name": "Filter_Active_Files",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Lookup_File_Config",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_File_Config').output.value",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().IsActive, '1')",
+						"type": "Expression"
+					}
 				}
 			}
 		],
