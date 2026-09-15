@@ -1,0 +1,12 @@
+{
+	"name": "LS_REST_API_ECOM_DEVLS_REST_API_ECOM_DEV",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://jsonplaceholder.typicode.com/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
