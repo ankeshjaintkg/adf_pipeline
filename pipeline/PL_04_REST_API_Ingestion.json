@@ -1,0 +1,7 @@
+{
+	"name": "PL_04_REST_API_Ingestion",
+	"properties": {
+		"description": "REST API → Bronze",
+		"annotations": []
+	}
+}
