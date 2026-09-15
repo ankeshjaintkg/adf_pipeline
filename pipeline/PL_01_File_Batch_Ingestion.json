@@ -93,10 +93,11 @@
 		"parameters": {
 			"p_SourceContainer": {
 				"type": "string",
-				"defaultValue": "source"
+				"defaultValue": "ecom-data"
 			},
 			"p_SourceDirectory": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "source"
 			},
 			"p_SourceFileName": {
 				"type": "string",
