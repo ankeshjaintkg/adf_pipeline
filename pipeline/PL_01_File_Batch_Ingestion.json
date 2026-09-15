@@ -4,94 +4,6 @@
 		"description": "CSV → ADLS Bronze",
 		"activities": [
 			{
-				"name": "CP_Source_To_Bronze",
-				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "DelimitedTextSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "DelimitedTextReadSettings"
-						}
-					},
-					"sink": {
-						"type": "DelimitedTextSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "DelimitedTextWriteSettings",
-							"quoteAllText": true,
-							"fileExtension": ".txt"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "DS_CSV_SOURCE",
-						"type": "DatasetReference",
-						"parameters": {
-							"p_container": {
-								"value": "@pipeline().parameters.p_SourceContainer",
-								"type": "Expression"
-							},
-							"p_directory": {
-								"value": "@pipeline().parameters.p_SourceDirectory",
-								"type": "Expression"
-							},
-							"p_files": {
-								"value": "@pipeline().parameters.p_SourceFileName",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "DS_CSV_BRONZE",
-						"type": "DatasetReference",
-						"parameters": {
-							"p_container": {
-								"value": "@pipeline().parameters.p_TargetContainer",
-								"type": "Expression"
-							},
-							"p_directory": {
-								"value": "@concat(pipeline().parameters.p_TargetFolder,'/',pipeline().parameters.p_TargetSubFolder,'/ingestion_date=',formatDateTime(utcNow(),'dd-mm-yyyy'))",
-								"type": "Expression"
-							},
-							"p_file_name": {
-								"value": "@pipeline().parameters.p_SourceFileName",
-								"type": "Expression"
-							}
-						}
-					}
-				]
-			},
-			{
 				"name": "Lookup_File_Config",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -129,7 +41,115 @@
 							},
 							"p_file": "file_ingestion_config.csv"
 						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_Files",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_File_Config",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_File_Config').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "CP_Source_To_Bronze",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_CSV_SOURCE",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_container": {
+											"value": "@pipeline().parameters.p_SourceContainer",
+											"type": "Expression"
+										},
+										"p_directory": {
+											"value": "@pipeline().parameters.p_SourceDirectory",
+											"type": "Expression"
+										},
+										"p_files": {
+											"value": "@item().SourceFileName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_CSV_BRONZE",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_container": {
+											"value": "@pipeline().parameters.p_SourceContainer",
+											"type": "Expression"
+										},
+										"p_directory": {
+											"value": "@concat(pipeline().parameters.p_TargetFolder,'/',item().TargetFolder,'/ingestion_date=',formatDateTime(utcNow(),'dd-MM-yyyy'))\n",
+											"type": "Expression"
+										},
+										"p_file_name": {
+											"value": "@item().SourceFileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
 				}
 			}
 		],
@@ -146,17 +166,9 @@
 				"type": "string",
 				"defaultValue": "customers.csv"
 			},
-			"p_TargetContainer": {
-				"type": "string",
-				"defaultValue": "ecom-data"
-			},
 			"p_TargetFolder": {
 				"type": "string",
 				"defaultValue": "bronze"
-			},
-			"p_TargetSubFolder": {
-				"type": "string",
-				"defaultValue": "customers"
 			}
 		},
 		"annotations": []
