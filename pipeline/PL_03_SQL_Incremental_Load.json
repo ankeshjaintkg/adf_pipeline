@@ -210,17 +210,17 @@
 										"typeProperties": {
 											"storedProcedureName": "[dbo].[usp_UpdateWatermark]",
 											"storedProcedureParameters": {
-												"@SourceTable": {
+												"SourceTable": {
 													"value": "@item().SourceTable"
 												},
-												"@WatermarkColumn": {
-													"value": "@item().WatermarkColumn"
-												},
-												"@NewWatermark": {
+												"NewWatermark": {
 													"value": {
 														"value": "@activity('Lookup_Max_Watermark').output.firstRow.MaxWatermark",
 														"type": "Expression"
 													}
+												},
+												"WatermarkColumn": {
+													"value": "@item().WatermarkColumn"
 												}
 											}
 										},
