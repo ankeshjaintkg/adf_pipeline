@@ -5,8 +5,16 @@
 			"referenceName": "LS_REST_API_ECOM_DEVLS_REST_API_ECOM_DEV",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"p_relative_url": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "@dataset().p_relative_url"
+		},
 		"schema": []
 	}
 }
