@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adfDFpro26"
+		},
+		"LS_ADLS_ECOM_DEV_accountKey": {
+			"value": ""
+		},
+		"LS_Source_Customers_accountKey": {
+			"value": ""
+		},
+		"LS_AZSQL_ECOM_DEV_password": {
+			"value": ""
+		},
+		"LS_ADLS_ECOM_DEV_properties_typeProperties_url": {
+			"value": "https://adfpro26.dfs.core.windows.net/"
+		},
+		"LS_Source_Customers_properties_typeProperties_url": {
+			"value": "https://adfpro26.dfs.core.windows.net/"
+		},
+		"LS_AZSQL_ECOM_DEV_properties_typeProperties_server": {
+			"value": "dfpro25dbserver.database.windows.net"
+		},
+		"LS_AZSQL_ECOM_DEV_properties_typeProperties_database": {
+			"value": "sqldb"
+		},
+		"LS_AZSQL_ECOM_DEV_properties_typeProperties_userName": {
+			"value": "admin25"
+		},
+		"LS_REST_API_ECOM_DEVLS_REST_API_ECOM_DEV_properties_typeProperties_url": {
+			"value": "https://jsonplaceholder.typicode.com/"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

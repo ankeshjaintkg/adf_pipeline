@@ -1,0 +1,105 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adfDFpro26"
+		},
+		"LS_ADLS_ECOM_DEV_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_ECOM_DEV'"
+		},
+		"LS_Source_Customers_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_Source_Customers'"
+		},
+		"LS_AZSQL_ECOM_DEV_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_AZSQL_ECOM_DEV'"
+		},
+		"LS_ADLS_ECOM_DEV_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adfpro26.dfs.core.windows.net/"
+		},
+		"LS_Source_Customers_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adfpro26.dfs.core.windows.net/"
+		},
+		"LS_AZSQL_ECOM_DEV_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "dfpro25dbserver.database.windows.net"
+		},
+		"LS_AZSQL_ECOM_DEV_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "sqldb"
+		},
+		"LS_AZSQL_ECOM_DEV_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "admin25"
+		},
+		"LS_REST_API_ECOM_DEVLS_REST_API_ECOM_DEV_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://jsonplaceholder.typicode.com/"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adfDFpro26_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"LS_ADLS_ECOM_DEV_accountKey": {
+						"value": "[parameters('LS_ADLS_ECOM_DEV_accountKey')]"
+					},
+					"LS_Source_Customers_accountKey": {
+						"value": "[parameters('LS_Source_Customers_accountKey')]"
+					},
+					"LS_AZSQL_ECOM_DEV_password": {
+						"value": "[parameters('LS_AZSQL_ECOM_DEV_password')]"
+					},
+					"LS_ADLS_ECOM_DEV_properties_typeProperties_url": {
+						"value": "[parameters('LS_ADLS_ECOM_DEV_properties_typeProperties_url')]"
+					},
+					"LS_Source_Customers_properties_typeProperties_url": {
+						"value": "[parameters('LS_Source_Customers_properties_typeProperties_url')]"
+					},
+					"LS_AZSQL_ECOM_DEV_properties_typeProperties_server": {
+						"value": "[parameters('LS_AZSQL_ECOM_DEV_properties_typeProperties_server')]"
+					},
+					"LS_AZSQL_ECOM_DEV_properties_typeProperties_database": {
+						"value": "[parameters('LS_AZSQL_ECOM_DEV_properties_typeProperties_database')]"
+					},
+					"LS_AZSQL_ECOM_DEV_properties_typeProperties_userName": {
+						"value": "[parameters('LS_AZSQL_ECOM_DEV_properties_typeProperties_userName')]"
+					},
+					"LS_REST_API_ECOM_DEVLS_REST_API_ECOM_DEV_properties_typeProperties_url": {
+						"value": "[parameters('LS_REST_API_ECOM_DEVLS_REST_API_ECOM_DEV_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
