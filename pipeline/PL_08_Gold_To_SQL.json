@@ -1,0 +1,7 @@
+{
+	"name": "PL_08_Gold_To_SQL",
+	"properties": {
+		"description": "ADLS → Azure SQL",
+		"annotations": []
+	}
+}
