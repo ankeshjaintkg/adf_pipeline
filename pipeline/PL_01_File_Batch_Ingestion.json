@@ -1,0 +1,7 @@
+{
+	"name": "PL_01_File_Batch_Ingestion",
+	"properties": {
+		"description": "CSV → ADLS Bronze",
+		"annotations": []
+	}
+}
